@@ -18,9 +18,10 @@
 #define mm_rw 100
 #define disk_rw 250000
 
-#define num_of_tests 10000
+#define num_of_tests 1000
 
 #define MYADDR "myaddresses.txt"
+#define BACKING_STORE_ADDR "BACKING_STORE.bin"
 
 
 int phys_mem[PHYS_MEM_SIZE];  /// 1 byte 
@@ -34,6 +35,8 @@ int final_value;    /* value read from phys mem */
 
 int tlb_front = -1;
 int tlb_back = -1;
+
+int current_frame = 0;
 
 /* VMM Funcs */
 
@@ -56,6 +59,6 @@ void write_on_file(int data);
 int menu();
 void print_statistics();
 bool check_arg(int argc, char* argv[]);
-void swap_in(int frame_num);
+void swap_in(int page_num);
 
  
