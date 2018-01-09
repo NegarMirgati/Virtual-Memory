@@ -2,4 +2,4 @@
 *.out
 *.txt
 *DS_Store
-
+vmm.o.dSYM/
