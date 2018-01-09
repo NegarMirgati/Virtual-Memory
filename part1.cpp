@@ -152,15 +152,6 @@ int find_in_tlb(int page_num){
 		return i;
 }
 
-int calc_phys_addr(int page_table_num, int offset){
-
-	int phys_addr=( phys_mem[page_table[page_table_num]] * FRAME_SIZE) + offset;
-
-	cout << " calculated phys addr is " << phys_addr << endl;
-
-	return phys_addr;
-
-}
 
 int find_in_page_table(int page_table_num){
 
@@ -243,6 +234,26 @@ int menu(){
 }
 
 void update_tlb(int page_num, int frame_num){
+
+    if (tlb_front == -1) {
+
+        tlb_front = 0;
+        tlb_back = 0;
+
+        tlb[tlb_back][0] = page_number;
+        tlb[tlb_back][1] = frame_number;
+    }
+    else {
+
+        tlb_front = (tlb_front + 1) % TLB_ENTRIES;
+        tlb_back = (tlb_back + 1) % TLB_ENTRIES;
+
+        tlb[tlb_back][0] = page_number;
+        tlb[tlb_back][1] = frame_number;
+    }
+}
+
+void swap_in(int frame_num){
 
 	//TODO
 }
