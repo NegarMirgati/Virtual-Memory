@@ -14,7 +14,7 @@ int main(int argc , char *argv[]){
    init_phys_mem();
    init_tlb();
 
-   run_vmm(argv[0]);
+   run_vmm(argv[1]);
 
 	return 0;
 }
@@ -39,20 +39,36 @@ void init_tlb(){}
 
 void run_vmm(char* addr){
 
-
-	cout << " Running Virtual Memory Manger ..." << endl;
+	int choice = menu();
 
 	ifstream infile;
 	string line;
-	infile.open(addr);
+	if(choice == 1) 
+		 infile.open(addr);
+	else
+	{
+    	generate_rands();
+		infile.open(MYADDR);
+	}
 
-	while(getline(infile, line)){
+	if (!infile){
+    cerr << "Unable to open file " << addr << endl;
+    exit(EXIT_FAILURE);   
+	}
+
+	cout << "Running Virtual Memory Manger ..." << endl;
+
+
+	while(infile >> line){
+
 
 		int offset = get_offset(line);
 		int page_table_num = get_page_num(line);
 
 		//TO-DO
 	}
+
+	 infile.close();
 }
 
 int get_offset(string addr){
@@ -120,3 +136,57 @@ void print_statistics(){
 	cout << "Hit Rate for #" << num_of_tests 
 			<< " addresses is : "<<hitRate << endl;
 }
+
+void generate_rands(){
+
+	cout << "Enter seed for random number generation " << endl;
+    int seed;
+	cin>> seed;
+	srand(seed);
+
+    for(int i = 0; i < num_of_tests; i++){
+
+    int  out = fRand(PHYS_MEM_SIZE);
+    write_on_file(out);
+  }
+}
+
+int fRand(int fMax){
+   
+    int f = rand() % fMax;
+    return f;
+}
+
+void write_on_file(int data){
+
+  ofstream myfile;
+  myfile.open(MYADDR, ios_base::app);
+
+  if (myfile.is_open())
+    myfile << data << " ";
+  else
+    exit(0);
+
+  myfile.close();
+  
+}
+
+int menu(){
+
+	cout << "***** MENU ***** " << endl;
+	cout << "Mode 1 : Execute VMM with the file provided"<<endl;
+	cout << "Mode 2 : Execute VMM with random addresses"<<endl;
+	
+	int choice;
+	cin >> choice;
+	if( choice != 1 && choice != 2){
+
+		cout <<" invalid choice";
+		exit(EXIT_FAILURE);
+	}
+
+	return choice;
+
+}
+
+
