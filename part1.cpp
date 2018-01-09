@@ -231,21 +231,18 @@ int menu(){
 
 void update_tlb(int page_num, int frame_num){
 
-    if (tlb_front == -1) {
+    if (tlb_ptr == -1) {
 
-        tlb_front = 0;
-        tlb_back = 0;
-
-        tlb[tlb_back][0] = page_num;
-        tlb[tlb_back][1] = frame_num;
+       tlb_ptr = 0;
+        tlb[tlb_ptr][0] = page_num;
+        tlb[tlb_ptr][1] = frame_num;
     }
     else {
 
-        tlb_front = (tlb_front + 1) % TLB_ENTRIES;
-        tlb_back = (tlb_back + 1) % TLB_ENTRIES;
+        tlb_ptr = (tlb_ptr + 1) % TLB_ENTRIES;
 
-        tlb[tlb_back][0] = page_num;
-        tlb[tlb_back][1] = frame_num;
+        tlb[tlb_ptr][0] = page_num;
+        tlb[tlb_ptr][1] = frame_num;
     }
 }
 
@@ -263,4 +260,9 @@ void swap_in(int page_num){
      	//cout << " writing " << buf[index] << " to phys_mem " << current_frame * 256 + index << endl;
         phys_mem[current_frame* 256 + index] = buf[index];
       }
+}
+
+void generate_rands_with_locality(){
+
+	//TODO
 }

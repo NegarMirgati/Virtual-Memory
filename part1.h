@@ -33,8 +33,7 @@ int num_of_page_faults = 0;
 
 int final_value;    /* value read from phys mem */
 
-int tlb_front = -1;
-int tlb_back = -1;
+int tlb_ptr = -1;   /* FIFO tlb replacement policy */
 
 int current_frame = 0;
 
@@ -54,6 +53,7 @@ void update_tlb(int page_num, int frame_num);
 
 /* Other Funcs*/
 void generate_rands();
+void generate_rands_with_locality();
 int fRand(int fMax);
 void write_on_file(int data);
 int menu();
