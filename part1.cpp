@@ -10,7 +10,7 @@ int main(int argc , char *argv[]){
 		exit(EXIT_FAILURE);
    
 
-   init_vm();
+   init_pt();
    init_phys_mem();
    init_tlb();
 
@@ -33,9 +33,23 @@ bool check_arg(int argc, char* argv[]){
 
 }
 
-void init_vm(){}
-void init_phys_mem(){}
-void init_tlb(){}
+void init_pt(){
+
+	 for (int i = 0; i < PAGE_TABLE_ENTRIES; i++) {
+        page_table[i] = -1;
+    }
+}
+void init_phys_mem(){
+
+	//TODO
+}
+void init_tlb(){
+
+	for (int i = 0; i < TLB_ENTRIES; i++) {
+        tlb[i][0] = -1;
+        tlb[i][1] = -1;
+    }
+}
 
 void run_vmm(char* addr){
 
@@ -81,10 +95,12 @@ int get_page_num(string addr){
 	return (atoi(addr.c_str() ) & (127 >> 8));
 }
 
-bool is_in_tlb(int page_num){
+int find_in_tlb(int page_num){
 
 	bool hit = false;
 	int i = 0;
+
+	// TLB Walk
 
 	for(i = 0; i < TLB_ENTRIES; i++){
 
@@ -96,16 +112,16 @@ bool is_in_tlb(int page_num){
 			break;
 		}
 	}
-	return hit;
-	/*if(!hit)
+	
+	if(!hit)
 		return -1;
 	else
-		return i;*/
+		return i;
 }
 
 int calc_phys_addr(int page_table_num, int offset){
 
-	int phys_addr=( phys_mem[page_table[page_table_num][0]] * FRAME_SIZE) + offset;
+	int phys_addr=( phys_mem[page_table[page_table_num]] * FRAME_SIZE) + offset;
 
 	cout << " calculated phys addr is " << phys_addr << endl;
 
@@ -113,15 +129,16 @@ int calc_phys_addr(int page_table_num, int offset){
 
 }
 
-bool page_fault(int page_table_num){
+int find_in_page_table(int page_table_num){
 
-	if(page_table[page_table_num][0] < 0){
+	int val = page_table[page_table_num];
 
-		num_of_page_faults ++;
-		return true;
-	}
+    if (val == -1) {
+		num_of_page_faults++;
+    }
+    
+    return val;
 
-	return false;
 }
 
 void print_statistics(){
@@ -135,6 +152,9 @@ void print_statistics(){
 
 	cout << "Hit Rate for #" << num_of_tests 
 			<< " addresses is : "<<hitRate << endl;
+
+
+	//TODO overhead
 }
 
 void generate_rands(){
