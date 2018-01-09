@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <time.h>
+#include <bitset>
 
 #define PAGE_SIZE 256
 #define PAGE_TABLE_ENTRIES 256
@@ -29,16 +30,19 @@ int tlb[TLB_ENTRIES][2];
 int num_of_tlb_hits = 0;
 int num_of_page_faults = 0;
 
+int final_value;
+
 /* VMM Funcs */
+
+
 void init_pt();
-void init_phys_mem();
 void init_tlb();
 
 
 void run_vmm(char* addr);
 int get_offset(std::string addr);
 int get_page_num(std::string addr);
-int find_in_tlb(int page_num); /*modified*/
+int find_in_tlb(int page_num);  /*modified*/
 int calc_phys_addr(int page_num, int offset);
 int find_in_page_table(int page_table_num); /*modified*/
 void update_tlb(int page_num, int frame_num); 

@@ -9,9 +9,7 @@ int main(int argc , char *argv[]){
 	if(!check_arg(argc, argv))
 		exit(EXIT_FAILURE);
    
-
    init_pt();
-   init_phys_mem();
    init_tlb();
 
    run_vmm(argv[1]);
@@ -39,10 +37,7 @@ void init_pt(){
         page_table[i] = -1;
     }
 }
-void init_phys_mem(){
 
-	//TODO
-}
 void init_tlb(){
 
 	for (int i = 0; i < TLB_ENTRIES; i++) {
@@ -75,11 +70,49 @@ void run_vmm(char* addr){
 
 	while(infile >> line){
 
+        /*cout << " virtual addr is " << line << endl;
+        std::cout << std::bitset<32>(atoi(line.c_str())) << endl;*/
+
 
 		int offset = get_offset(line);
-		int page_table_num = get_page_num(line);
+		int page_num = get_page_num(line);
 
-		//TO-DO
+		/*cout << " offset is " << offset << endl;
+		std::cout << std::bitset<8>(offset);*/
+
+		/*cout << " page num is " << page_num << endl;
+		std::cout << std::bitset<8>(page_num);*/
+
+		break;
+
+
+		int frame_num = find_in_tlb(page_num);
+
+		/* TLB hit */
+		if(frame_num != -1){
+
+				/* check this */
+			    int phys_addr = frame_num * FRAME_SIZE + offset;
+                final_value = phys_mem[phys_addr];
+		}
+
+		else{
+
+			frame_num = find_in_page_table(page_num);
+			/* found in page table */
+			if(frame_num != -1){
+
+				int phys_addr = frame_num * FRAME_SIZE + offset;
+				update_tlb(page_num, frame_num);
+
+
+			}
+
+
+		}
+		
+
+		
 	}
 
 	 infile.close();
@@ -87,12 +120,12 @@ void run_vmm(char* addr){
 
 int get_offset(string addr){
  
- 	return ( atoi(addr.c_str()) & 127);  
+ 	return ( atoi(addr.c_str()) & 255);  
 }
 
 int get_page_num(string addr){
 
-	return (atoi(addr.c_str() ) & (127 >> 8));
+	return ((atoi(addr.c_str()  )/256) & (255));
 }
 
 int find_in_tlb(int page_num){
@@ -207,6 +240,11 @@ int menu(){
 
 	return choice;
 
+}
+
+void update_tlb(int page_num, int frame_num){
+
+	//TODO
 }
 
 
