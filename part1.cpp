@@ -271,7 +271,7 @@ void swap_in(int page_num){
 	 FILE *backingStore = fopen("BACKING_STORE.bin", "rb");
 
 	 fseek(backingStore, current_frame*256, SEEK_SET);
-     /*fread(buf, sizeof(char), 256, backingStore);
+     fread(buf, sizeof(char), 256, backingStore);
 
      cout << "here "<< endl;
 
@@ -279,5 +279,5 @@ void swap_in(int page_num){
 
      	cout << " writing " << buf[index] << " to phys_mem " << current_frame * 256 + index << endl;
         phys_mem[current_frame* 256 + index] = buf[index];
-      }*/
+      }
 }
