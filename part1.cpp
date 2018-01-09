@@ -67,8 +67,17 @@ void run_vmm(char* addr){
 
 	while(infile >> line){
 
+<<<<<<< HEAD
 		//cout << " addr number " << counter << endl;
 		counter ++;
+=======
+		cout << " addr number " << counter << endl;
+		counter ++;
+		int a;
+		cout << sizeof(char) << endl;
+		cin >> a;
+
+>>>>>>> 8e500e6db92214deb2915327026f3e26d2787e97
 
         /*cout << " virtual addr is " << line << endl;
         std::cout << std::bitset<32>(atoi(line.c_str())) << endl;*/
@@ -88,7 +97,11 @@ void run_vmm(char* addr){
 		if(frame_num != -1){
 
 				/* check this */
+<<<<<<< HEAD
 			    //cout << " TLB hit " << endl;
+=======
+			    cout << " TLB hit " << endl;
+>>>>>>> 8e500e6db92214deb2915327026f3e26d2787e97
 			    int phys_addr = frame_num * FRAME_SIZE + offset;
                 final_value = phys_mem[phys_addr];
 		}
@@ -167,12 +180,22 @@ void print_statistics(){
 	
 	cout.precision(16);
 
+<<<<<<< HEAD
 	double pageFaultRate = ((num_of_page_faults / (double)num_of_tests));
+=======
+	cout << " num_of_page_faults " << num_of_page_faults << " num_of_tlb_hits " << num_of_tlb_hits << endl;
+
+	double pageFaultRate =  ( (num_of_page_faults / (double)num_of_tests) );
+>>>>>>> 8e500e6db92214deb2915327026f3e26d2787e97
 
 	cout << "Page Fault Rate for #" << num_of_tests 
 			<< " addresses is : "<<pageFaultRate << endl;
 
+<<<<<<< HEAD
 	double hitRate = ((num_of_tlb_hits / (double)num_of_tests));
+=======
+	double hitRate =  ((num_of_tlb_hits / (double)num_of_tests) );
+>>>>>>> 8e500e6db92214deb2915327026f3e26d2787e97
 
 	cout << "Hit Rate for #" << num_of_tests 
 			<< " addresses is : "<<hitRate << endl;
@@ -256,22 +279,38 @@ void swap_in(int page_num){
 	char buf[256];
 	int index = 0;
 
+<<<<<<< HEAD
 	//cout << " page number " << page_num << " frame number " << current_frame << endl;
 
 	 //cout << " PAGE FAULT : SWAPPING IN  ... "<<endl;
 
 	 //cout << " current frame = " << current_frame << endl;
+=======
+	cout << " page number " << page_num << " frame number " << current_frame << endl;
+
+	 cout << " PAGE FAULT : SWAPPING IN  ... "<<endl;
+
+	 cout << " current frame = " << current_frame << endl;
+>>>>>>> 8e500e6db92214deb2915327026f3e26d2787e97
 
 	 FILE *backingStore = fopen("BACKING_STORE.bin", "rb");
 
 	 fseek(backingStore, current_frame*256, SEEK_SET);
      fread(buf, sizeof(char), 256, backingStore);
 
+<<<<<<< HEAD
      //cout << "here "<< endl;
 
      for(index = 0; index < 256; index++) {
 
      	//cout << " writing " << buf[index] << " to phys_mem " << current_frame * 256 + index << endl;
+=======
+     cout << "here "<< endl;
+
+     for(index = 0; index < 256; index++) {
+
+     	cout << " writing " << buf[index] << " to phys_mem " << current_frame * 256 + index << endl;
+>>>>>>> 8e500e6db92214deb2915327026f3e26d2787e97
         phys_mem[current_frame* 256 + index] = buf[index];
       }
 }
