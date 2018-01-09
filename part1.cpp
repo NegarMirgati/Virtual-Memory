@@ -49,7 +49,7 @@ void run_vmm(char* addr){
 	while(getline(infile, line)){
 
 		int offset = get_offset(line);
-		int page_table_num = get_page_number(line);
+		int page_table_num = get_page_num(line);
 
 		//TO-DO
 	}
@@ -60,7 +60,7 @@ int get_offset(string addr){
  	return ( atoi(addr.c_str()) & 127);  
 }
 
-int get_page_number(string addr){
+int get_page_num(string addr){
 
 	return (atoi(addr.c_str() ) & (127 >> 8));
 }
@@ -76,6 +76,7 @@ bool is_in_tlb(int page_num){
 
 			cout << " page number #"<<page_num << " was found in TLB " << endl;
 			hit = true;
+			num_of_tlb_hits ++;
 			break;
 		}
 	}
@@ -88,10 +89,34 @@ bool is_in_tlb(int page_num){
 
 int calc_phys_addr(int page_table_num, int offset){
 
-	int phys_addr=( phys_mem[v_mem[page_table_num][0]] * FRAME_SIZE) + offset;
+	int phys_addr=( phys_mem[page_table[page_table_num][0]] * FRAME_SIZE) + offset;
 
 	cout << " calculated phys addr is " << phys_addr << endl;
 
 	return phys_addr;
 
+}
+
+bool page_fault(int page_table_num){
+
+	if(page_table[page_table_num][0] < 0){
+
+		num_of_page_faults ++;
+		return true;
+	}
+
+	return false;
+}
+
+void print_statistics(){
+
+	double pageFaultRate = (double) ( (num_of_page_faults / num_of_tests) * 100);
+
+	cout << "Page Fault Rate for #" << num_of_tests 
+			<< " addresses is : "<<pageFaultRate << endl;
+
+	double hitRate = (double) ((num_of_tlb_hits / num_of_tests) * 100);
+
+	cout << "Hit Rate for #" << num_of_tests 
+			<< " addresses is : "<<hitRate << endl;
 }

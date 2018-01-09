@@ -10,15 +10,18 @@
 #define TLB_ENTRIES 16
 
 #define MM_SIZE 128
-#define VM_SIZE 256
+#define PT_SIZE 256
 
 
 #define tlb_rw 0.5
 #define mm_rw 100
 #define disk_rw 250000
 
+#define num_of_tests 10000
+
+
 int phys_mem[MM_SIZE];
-int v_mem[VM_SIZE][2];
+int page_table[PT_SIZE][2];
 int tlb[TLB_ENTRIES][2];
 
 int num_of_tlb_hits = 0;
@@ -34,3 +37,4 @@ int get_offset(std::string addr);
 int get_page_num(std::string addr);
 bool is_in_tlb(int page_num);
 int calc_phys_addr(int page_num, int offset);
+bool page_fault(int page_table_num);
