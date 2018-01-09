@@ -3,7 +3,6 @@
 
 using namespace std;
 
-
 int main(int argc , char *argv[]){
 
 	if(!check_arg(argc, argv))
@@ -17,18 +16,15 @@ int main(int argc , char *argv[]){
 	return 0;
 }
 
-
 bool check_arg(int argc, char* argv[]){
 
 	if(argc != 2){
 
 		cout << " valid operaton " << argv[0] << " [addresses.txt] " << endl;
 		return false;
-
 	}
 
 	return true;
-
 }
 
 void init_pt(){
@@ -67,12 +63,19 @@ void run_vmm(char* addr){
 
 	cout << "Running Virtual Memory Manger ..." << endl;
 
+	int counter = 0;
 
 	while(infile >> line){
 
+		cout << " addr number " << counter << endl;
+		counter ++;
+		int a;
+		cout << sizeof(char) << endl;
+		cin >> a;
+
+
         /*cout << " virtual addr is " << line << endl;
         std::cout << std::bitset<32>(atoi(line.c_str())) << endl;*/
-
 
 		int offset = get_offset(line);
 		int page_num = get_page_num(line);
@@ -83,15 +86,13 @@ void run_vmm(char* addr){
 		/*cout << " page num is " << page_num << endl;
 		std::cout << std::bitset<8>(page_num);*/
 
-		break;
-
-
 		int frame_num = find_in_tlb(page_num);
 
 		/* TLB hit */
 		if(frame_num != -1){
 
 				/* check this */
+			    cout << " TLB hit " << endl;
 			    int phys_addr = frame_num * FRAME_SIZE + offset;
                 final_value = phys_mem[phys_addr];
 		}
@@ -104,18 +105,21 @@ void run_vmm(char* addr){
 
 				int phys_addr = frame_num * FRAME_SIZE + offset;
 				update_tlb(page_num, frame_num);
+			}
+			// not found in page table : demand paging
+			else{
 
+				swap_in(page_num);
+			    // update page table
+				page_table[page_num] = current_frame;
+				current_frame ++;
 
 			}
-
-
-		}
-		
-
-		
+		}			
 	}
 
 	 infile.close();
+	 print_statistics();
 }
 
 int get_offset(string addr){
@@ -134,7 +138,6 @@ int find_in_tlb(int page_num){
 	int i = 0;
 
 	// TLB Walk
-
 	for(i = 0; i < TLB_ENTRIES; i++){
 
 		if(tlb[i][0] == page_num){
@@ -152,7 +155,6 @@ int find_in_tlb(int page_num){
 		return i;
 }
 
-
 int find_in_page_table(int page_table_num){
 
 	int val = page_table[page_table_num];
@@ -162,21 +164,24 @@ int find_in_page_table(int page_table_num){
     }
     
     return val;
-
 }
 
 void print_statistics(){
 
-	double pageFaultRate = (double) ( (num_of_page_faults / num_of_tests) * 100);
+	
+	cout.precision(16);
+
+	cout << " num_of_page_faults " << num_of_page_faults << " num_of_tlb_hits " << num_of_tlb_hits << endl;
+
+	double pageFaultRate =  ( (num_of_page_faults / (double)num_of_tests) );
 
 	cout << "Page Fault Rate for #" << num_of_tests 
 			<< " addresses is : "<<pageFaultRate << endl;
 
-	double hitRate = (double) ((num_of_tlb_hits / num_of_tests) * 100);
+	double hitRate =  ((num_of_tlb_hits / (double)num_of_tests) );
 
 	cout << "Hit Rate for #" << num_of_tests 
 			<< " addresses is : "<<hitRate << endl;
-
 
 	//TODO overhead
 }
@@ -230,7 +235,6 @@ int menu(){
 	}
 
 	return choice;
-
 }
 
 void update_tlb(int page_num, int frame_num){
@@ -240,22 +244,40 @@ void update_tlb(int page_num, int frame_num){
         tlb_front = 0;
         tlb_back = 0;
 
-        tlb[tlb_back][0] = page_number;
-        tlb[tlb_back][1] = frame_number;
+        tlb[tlb_back][0] = page_num;
+        tlb[tlb_back][1] = frame_num;
     }
     else {
 
         tlb_front = (tlb_front + 1) % TLB_ENTRIES;
         tlb_back = (tlb_back + 1) % TLB_ENTRIES;
 
-        tlb[tlb_back][0] = page_number;
-        tlb[tlb_back][1] = frame_number;
+        tlb[tlb_back][0] = page_num;
+        tlb[tlb_back][1] = frame_num;
     }
 }
 
-void swap_in(int frame_num){
+void swap_in(int page_num){
 
-	//TODO
+	char buf[256];
+	int index = 0;
+
+	cout << " page number " << page_num << " frame number " << current_frame << endl;
+
+	 cout << " PAGE FAULT : SWAPPING IN  ... "<<endl;
+
+	 cout << " current frame = " << current_frame << endl;
+
+	 FILE *backingStore = fopen("BACKING_STORE.bin", "rb");
+
+	 fseek(backingStore, current_frame*256, SEEK_SET);
+     /*fread(buf, sizeof(char), 256, backingStore);
+
+     cout << "here "<< endl;
+
+     for(index = 0; index < 256; index++) {
+
+     	cout << " writing " << buf[index] << " to phys_mem " << current_frame * 256 + index << endl;
+        phys_mem[current_frame* 256 + index] = buf[index];
+      }*/
 }
-
-
