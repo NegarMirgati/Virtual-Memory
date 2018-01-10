@@ -41,9 +41,28 @@ void init_tlb(){
     }
 }
 
+void init_counter_usage_frame(){
+	for ( int i = 0 ; i < NUM_OF_FRAMES; i++) {
+		counter_usage_frame[i] = 0;
+	}
+}
+
+void init_state_phys_mem(){
+	for ( int i = 0 ; i < NUM_OF_FRAMES; i++) {
+		state_phys_mem[i] = 0;
+	}
+}
+
 void run_vmm(char* addr){
 
 	int choice = menu();
+	page_replacement_policy = menu_PRP();
+
+	if ( page_replacement_policy == 2 )
+	{
+		init_counter_usage_frame();
+		init_state_phys_mem();
+	}
 
 	ifstream infile;
 	
@@ -90,6 +109,7 @@ void run_vmm(char* addr){
 				/* check this */
 			    int phys_addr = frame_num * FRAME_SIZE + offset;
                 final_value = phys_mem[phys_addr];
+                update_counter_usage_frame(frame_num);
 		}
 
 		else{
@@ -101,9 +121,14 @@ void run_vmm(char* addr){
 				int phys_addr = frame_num * FRAME_SIZE + offset;
 				update_tlb(page_num, frame_num);
 				final_value = phys_mem[phys_addr];
+
+				if ( page_replacement_policy == 2 )
+					update_counter_usage_frame(frame_num);
+
 			}
 			// not found in page table : demand paging
 			else{
+
 				swap_in(page_num);
 			    // update page table
 				page_table[page_num] = current_frame;
@@ -113,6 +138,7 @@ void run_vmm(char* addr){
 
 				/* Check This */
 				update_tlb(page_num, current_frame);
+				if ( page_replacement_policy == 1) // fifo
 				current_frame ++;
 			}
 		}			
@@ -242,6 +268,21 @@ int menu(){
 	}
 	return choice;
 }
+int menu_PRP(){
+
+	cout << "***** choose page replacement policy ***** " << endl;
+	cout << "Mode 1 : FIFO"<<endl;
+	cout << "Mode 2 : LRU"<<endl;
+	
+	int choice;
+	cin >> choice;
+	if( choice != 1 && choice != 2){
+
+		cout <<" invalid choice";
+		exit(EXIT_FAILURE);
+	}
+	return choice;
+}
 
 void update_tlb(int page_num, int frame_num){
 
@@ -261,19 +302,38 @@ void update_tlb(int page_num, int frame_num){
 
 }
 
+
 void swap_in(int page_num){
 
 	char buf[256];
 	int index = 0;
 
 	 FILE *backingStore = fopen("BACKING_STORE.bin", "rb");
-	 cout << " current frame = " << current_frame << endl;
-
-	 if(current_frame >=  128){
-
+	 //cout << " current frame = " << current_frame << endl;
+	 
+	 if ( page_replacement_policy == 2)  // LRU
+	 {
+	 	 int available_frame;
+	 	 bool mem_state = is_memory_full(available_frame);
+	 	 if ( mem_state == true )
+	 	 {
+	 	 	 cout << " memory is full " << endl;
+	 	 	 current_frame =find_LRU();
+	 	 }
+	 	 else if ( mem_state == false )
+	 	 {
+	 	 	current_frame = available_frame;
+	 	 }
+	 }
+	 
+	 else if ( page_replacement_policy == 1) // FIFO
+	 {
+	 	 if(current_frame >=  128){
 	 	 current_frame = 0;
 	 	 cout << " memory is full " << endl;
+	     }
 	 }
+     cout << " current frame = " << current_frame << endl;
 
 	 fseek(backingStore, current_frame*256, SEEK_SET);
      fread(buf, sizeof(char), 256, backingStore);
@@ -282,15 +342,12 @@ void swap_in(int page_num){
      	//cout << " writing " << buf[index] << " to phys_mem " << current_frame * 256 + index << endl;
         phys_mem[current_frame* 256 + index] = buf[index];
       }
+       state_phys_mem[current_frame] = 1;
+       update_counter_usage_frame(current_frame); /*?*/
   
 }
 
 void generate_rands_with_locality(int mode){
-
-	cout << "Enter seed for random number generation " << endl;
-    int seed;
-	cin>> seed;
-	srand(seed);
 
 	ofstream outfile;
 	outfile.open("myaddresses.txt");
@@ -324,9 +381,54 @@ void generate_rands_with_locality(int mode){
     		 outfile << f << endl;
     		 counter ++;
 		 }    
+
+
   }
 
 }
 
 }
 
+
+void update_counter_usage_frame(int frame_num){
+
+	counter_usage_frame[frame_num]++;
+}
+
+bool is_memory_full(int& available_frame){
+	
+	for ( int i = 0 ; i < NUM_OF_FRAMES;i++)
+	{
+		if ( state_phys_mem[i] == 0 )
+		{
+			available_frame = i;
+			return false; // mem is not full
+		} 
+
+	}
+	return true; // mem is full
+}
+
+int find_LRU(){
+	
+	int done = 0;
+	int min = counter_usage_frame[0];
+	int frame;
+	for ( int i = 1 ; i < NUM_OF_FRAMES; i++)
+	{
+		if ( counter_usage_frame[i] <  min )
+		{
+			min = counter_usage_frame[i];
+			done = 1;
+			frame = i;
+		}
+	}
+	if ( done == 1) {
+		counter_usage_frame[frame] = 0;
+		return frame;
+	}
+	else if ( done == 0) {
+		counter_usage_frame[0] = 0;
+		return 0;
+	}
+}

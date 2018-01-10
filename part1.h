@@ -50,6 +50,7 @@ int get_page_num(std::string addr);
 int find_in_tlb(int page_num);  /*modified*/
 int find_in_page_table(int page_table_num); /*modified*/
 void update_tlb(int page_num, int frame_num); 
+void swap_in(int page_num);
 
 /* Other Funcs*/
 void generate_rands();
@@ -58,6 +59,6 @@ int fRand(int fMax);
 int menu();
 void print_statistics();
 bool check_arg(int argc, char* argv[]);
-void swap_in(int page_num);
+
 
  

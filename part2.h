@@ -15,7 +15,7 @@
 
 
 #define tlb_rw 0.5
-#define mm_rw 100
+#define mm_rw 1000
 #define disk_rw 250000
 
 #define num_of_tests 1000
@@ -27,6 +27,8 @@
 int phys_mem[PHYS_MEM_SIZE];  /// 1 byte 
 int page_table[PAGE_TABLE_ENTRIES];
 int tlb[TLB_ENTRIES][2];
+int counter_usage_frame[NUM_OF_FRAMES];  //recently used page in frame will have a bigger number
+int state_phys_mem[NUM_OF_FRAMES]; // 0 => empty ,  1=> full 
 
 int num_of_tlb_hits = 0;
 int num_of_page_faults = 0;
@@ -37,12 +39,15 @@ int tlb_ptr = -1;   /* FIFO tlb replacement policy */
 
 int current_frame = 0;
 
+int page_replacement_policy;  /* 1.FIFO 2.LRU 3.second chance 4.random replacement */
+
 /* VMM Funcs */
 
 
 void init_pt();
 void init_tlb();
-
+void init_counter_usage_frame();
+void init_state_phys_mem();
 
 void run_vmm(char* addr);
 int get_offset(std::string addr);
@@ -50,12 +55,16 @@ int get_page_num(std::string addr);
 int find_in_tlb(int page_num);  /*modified*/
 int find_in_page_table(int page_table_num); /*modified*/
 void update_tlb(int page_num, int frame_num); 
+void update_counter_usage_frame(int frame_num);
+bool is_memory_full(int& available_frame);
+int find_LRU();
 
 /* Other Funcs*/
 void generate_rands();
 void generate_rands_with_locality(int mode);
 int fRand(int fMax);
 int menu();
+int menu_PRP();
 void print_statistics();
 bool check_arg(int argc, char* argv[]);
 void swap_in(int page_num);
