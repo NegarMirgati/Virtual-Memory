@@ -177,7 +177,16 @@ void print_statistics(){
 			<< " addresses is : "<<hitRate << endl;
 
 
-	//TODO overhead
+	//Check this
+	/*
+		tlb hit : reads from TLB , reads value from physical memory
+		tlb-miss , page-table hit : reads from TLB , reads from page-table , reads from phys_mem , updates tlb
+		pageFault : reads from tlb, reads from page-table, reads from disk, writes to phys_mem, updates page table
+					reads from phys_mem
+	 */		
+	double overhead = (hitRate) * (tlb_rw + mm_rw) + (1 - (pageFaultRate + hitRate)) * (2*tlb_rw + 2*mm_rw) +
+					  (pageFaultRate) * (tlb_rw + 4*mm_rw + disk_rw);
+	cout << " Total Overhead for #"<<num_of_tests<<" addresses is : "<<overhead << " nanoseconds"<<endl;
 }
 
 void generate_rands(){
