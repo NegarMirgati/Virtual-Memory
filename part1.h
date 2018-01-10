@@ -18,7 +18,7 @@
 #define mm_rw 100
 #define disk_rw 250000
 
-#define num_of_tests 1000
+#define num_of_tests 10000
 
 #define MYADDR "myaddresses.txt"
 #define BACKING_STORE_ADDR "BACKING_STORE.bin"

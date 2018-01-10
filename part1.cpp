@@ -172,10 +172,10 @@ void print_statistics(){
 
 	double hitRate = ((num_of_tlb_hits / (double)num_of_tests) );
 
-	cout << " num of hits" << num_of_tlb_hits << endl;
 
 	cout << "Hit Rate for #" << num_of_tests 
 			<< " addresses is : "<<hitRate << endl;
+
 
 	//TODO overhead
 }
