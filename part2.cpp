@@ -287,6 +287,11 @@ void swap_in(int page_num){
 
 void generate_rands_with_locality(int mode){
 
+	cout << "Enter seed for random number generation " << endl;
+    int seed;
+	cin>> seed;
+	srand(seed);
+
 	ofstream outfile;
 	outfile.open("myaddresses.txt");
 
@@ -319,8 +324,6 @@ void generate_rands_with_locality(int mode){
     		 outfile << f << endl;
     		 counter ++;
 		 }    
-
-
   }
 
 }
