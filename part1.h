@@ -53,7 +53,7 @@ void update_tlb(int page_num, int frame_num);
 
 /* Other Funcs*/
 void generate_rands();
-void generate_rands_with_locality();
+void generate_rands_with_locality(int mode);
 int fRand(int fMax);
 int menu();
 void print_statistics();

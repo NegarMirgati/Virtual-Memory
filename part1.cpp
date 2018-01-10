@@ -52,7 +52,7 @@ void run_vmm(char* addr){
 		 infile.open(addr);
 	else
 	{
-    	generate_rands_with_locality();
+    	generate_rands_with_locality(1);
 		infile.open(MYADDR);
 	}
 
@@ -277,23 +277,45 @@ void swap_in(int page_num){
       }
 }
 
-void generate_rands_with_locality(){
+void generate_rands_with_locality(int mode){
 
 	ofstream outfile;
 	outfile.open("myaddresses.txt");
 
-	int counter = 0;
+	if(mode == 0){
 
-	for(int i = 0 ; i < 1000 ; i++){
+		int counter = 0;
 
-     int temp_f = rand() % PHYS_MEM_SIZE;
+		for(int i = 0 ; i < 1000 ; i++){
 
-     for(int j = 0 ; j < 100 ; j++){
-     int f = (temp_f + j) % PHYS_MEM_SIZE;
-     outfile << f << endl;
-     counter ++;
-	 }
-     
+    	 int temp_f = rand() % PHYS_MEM_SIZE;
+
+     	for(int j = 0 ; j < 10 ; j++){
+    		 int f = (temp_f + j) % PHYS_MEM_SIZE;
+    		 outfile << f << endl;
+    		 counter ++;
+		 }    
+ 	 }
+  }
+
+  else if (mode == 1){
+
+  	int counter = 0;
+
+		for(int i = 0 ; i < 100 ; i++){
+
+    	 int temp_f = rand() % PHYS_MEM_SIZE;
+
+     	for(int j = 0 ; j < 100 ; j++){
+    		 int f = (temp_f + j) % PHYS_MEM_SIZE;
+    		 outfile << f << endl;
+    		 counter ++;
+		 }    
+
+
   }
 
 }
+
+}
+
