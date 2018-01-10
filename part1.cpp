@@ -52,7 +52,7 @@ void run_vmm(char* addr){
 		 infile.open(addr);
 	else
 	{
-    	generate_rands_with_locality(1);
+    	generate_rands();
 		infile.open(MYADDR);
 	}
 
@@ -197,7 +197,7 @@ void print_statistics(){
 
 void generate_rands(){
 
-	cout << "Enter seed for random number generation " << endl;
+	cout << "Enter seed for random address generation " << endl;
     int seed;
 	cin>> seed;
 	srand(seed);
@@ -207,7 +207,9 @@ void generate_rands(){
 
     for(int i = 0; i < num_of_tests; i++){
 
-   		int  out = fRand(PHYS_MEM_SIZE);
+   		int  temp_out = fRand(PHYS_MEM_SIZE);
+   		int ratio = fRand(2);
+   		long out = (ratio+1) * temp_out;
     	if (myfile.is_open()){
 
     		myfile << out << endl;
@@ -216,9 +218,7 @@ void generate_rands(){
    			exit(0);
 
   }
-
    myfile.close(); 
-
 }
 
 int fRand(int fMax){
@@ -279,13 +279,13 @@ void swap_in(int page_num){
 
 void generate_rands_with_locality(int mode){
 
-	cout << "Enter seed for random number generation " << endl;
-    int seed;
-	cin>> seed;
-	srand(seed);
-
 	ofstream outfile;
 	outfile.open("myaddresses.txt");
+
+	cout << "Enter seed for random address generation" << endl;
+	int seed;
+	cin >> seed;
+	srand(seed);
 
 	if(mode == 0){
 
@@ -297,7 +297,9 @@ void generate_rands_with_locality(int mode){
 
      	for(int j = 0 ; j < 10 ; j++){
     		 int f = (temp_f + j) % PHYS_MEM_SIZE;
-    		 outfile << f << endl;
+    		 int ratio = fRand(2);
+    		 long out = f * (ratio + 1);
+    		 outfile << out << endl;
     		 counter ++;
 		 }    
  	 }
@@ -313,12 +315,13 @@ void generate_rands_with_locality(int mode){
 
      	for(int j = 0 ; j < 100 ; j++){
     		 int f = (temp_f + j) % PHYS_MEM_SIZE;
-    		 outfile << f << endl;
+    		 int ratio = fRand(2);
+    		 long out = f * (ratio + 1);
+    		 outfile << out << endl;
     		 counter ++;
 		 }    
-  }
-
-}
+      }
+   }
 
 }
 
