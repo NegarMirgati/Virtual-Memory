@@ -1,4 +1,3 @@
-
 #include "part1.h"
 
 using namespace std;
@@ -47,12 +46,13 @@ void run_vmm(char* addr){
 	int choice = menu();
 
 	ifstream infile;
+	
 	string line;
 	if(choice == 1) 
 		 infile.open(addr);
 	else
 	{
-    	generate_rands();
+    	generate_rands_with_locality();
 		infile.open(MYADDR);
 	}
 
@@ -65,13 +65,16 @@ void run_vmm(char* addr){
 
 	int counter = 0;
 
-	while(infile >> line){
+
+	while(getline(infile, line)){
 
         /*cout << " virtual addr is " << line << endl;
         std::cout << std::bitset<32>(atoi(line.c_str())) << endl;*/
 
 		int offset = get_offset(line);
 		int page_num = get_page_num(line);
+
+		counter++;
 
 		/*cout << " offset is " << offset << endl;
 		std::cout << std::bitset<8>(offset);*/
@@ -85,8 +88,6 @@ void run_vmm(char* addr){
 		if(frame_num != -1){
 
 				/* check this */
-
-			    //cout << " TLB hit " << endl;
 			    int phys_addr = frame_num * FRAME_SIZE + offset;
                 final_value = phys_mem[phys_addr];
 		}
@@ -99,15 +100,20 @@ void run_vmm(char* addr){
 
 				int phys_addr = frame_num * FRAME_SIZE + offset;
 				update_tlb(page_num, frame_num);
+				final_value = phys_mem[phys_addr];
 			}
 			// not found in page table : demand paging
 			else{
-
 				swap_in(page_num);
 			    // update page table
 				page_table[page_num] = current_frame;
-				current_frame ++;
 
+				int phys_addr = current_frame * FRAME_SIZE + offset;
+				final_value = phys_mem[phys_addr];
+
+				/* Check This */
+				//update_tlb(page_num, current_frame);
+				current_frame ++;
 			}
 		}			
 	}
@@ -136,7 +142,6 @@ int find_in_tlb(int page_num){
 
 		if(tlb[i][0] == page_num){
 
-			//cout << " page number #"<<page_num << " was found in TLB " << endl;
 			hit = true;
 			num_of_tlb_hits ++;
 			break;
@@ -172,10 +177,11 @@ void print_statistics(){
 
 	double hitRate = ((num_of_tlb_hits / (double)num_of_tests) );
 
+	cout << " Hits : " << num_of_tlb_hits << endl;
+
 
 	cout << "Hit Rate for #" << num_of_tests 
 			<< " addresses is : "<<hitRate << endl;
-
 
 	//Check this
 	/*
@@ -186,7 +192,7 @@ void print_statistics(){
 	 */		
 	double overhead = (hitRate) * (tlb_rw + mm_rw) + (1 - (pageFaultRate + hitRate)) * (2*tlb_rw + 2*mm_rw) +
 					  (pageFaultRate) * (tlb_rw + 4*mm_rw + disk_rw);
-	cout << " Total Overhead for #"<<num_of_tests<<" addresses is : "<<overhead << " nanoseconds"<<endl;
+	cout << "Total Overhead for #"<<num_of_tests<<" addresses is : "<<overhead << " nanoseconds"<<endl;
 }
 
 void generate_rands(){
@@ -196,31 +202,29 @@ void generate_rands(){
 	cin>> seed;
 	srand(seed);
 
+	ofstream myfile;
+    myfile.open(MYADDR, ios_base::app);
+
     for(int i = 0; i < num_of_tests; i++){
 
-    int  out = fRand(PHYS_MEM_SIZE);
-    write_on_file(out);
+   		int  out = fRand(PHYS_MEM_SIZE);
+    	if (myfile.is_open()){
+
+    		myfile << out << endl;
+    	}
+	  else
+   			exit(0);
+
   }
+
+   myfile.close(); 
+
 }
 
 int fRand(int fMax){
    
     int f = rand() % fMax;
     return f;
-}
-
-void write_on_file(int data){
-
-  ofstream myfile;
-  myfile.open(MYADDR, ios_base::app);
-
-  if (myfile.is_open())
-    myfile << data << " ";
-  else
-    exit(0);
-
-  myfile.close();
-  
 }
 
 int menu(){
@@ -236,7 +240,6 @@ int menu(){
 		cout <<" invalid choice";
 		exit(EXIT_FAILURE);
 	}
-
 	return choice;
 }
 
@@ -255,6 +258,7 @@ void update_tlb(int page_num, int frame_num){
         tlb[tlb_ptr][0] = page_num;
         tlb[tlb_ptr][1] = frame_num;
     }
+
 }
 
 void swap_in(int page_num){
@@ -275,5 +279,21 @@ void swap_in(int page_num){
 
 void generate_rands_with_locality(){
 
-	//TODO
+	ofstream outfile;
+	outfile.open("myaddresses.txt");
+
+	int counter = 0;
+
+	for(int i = 0 ; i < 1000 ; i++){
+
+     int temp_f = rand() % PHYS_MEM_SIZE;
+
+     for(int j = 0 ; j < 100 ; j++){
+     int f = (temp_f + j) % PHYS_MEM_SIZE;
+     outfile << f << endl;
+     counter ++;
+	 }
+     
+  }
+
 }

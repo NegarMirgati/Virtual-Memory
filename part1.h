@@ -18,7 +18,7 @@
 #define mm_rw 100
 #define disk_rw 250000
 
-#define num_of_tests 10000
+#define num_of_tests 1000
 
 #define MYADDR "myaddresses.txt"
 #define BACKING_STORE_ADDR "BACKING_STORE.bin"
@@ -55,7 +55,6 @@ void update_tlb(int page_num, int frame_num);
 void generate_rands();
 void generate_rands_with_locality();
 int fRand(int fMax);
-void write_on_file(int data);
 int menu();
 void print_statistics();
 bool check_arg(int argc, char* argv[]);
