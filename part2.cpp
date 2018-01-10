@@ -58,6 +58,12 @@ void run_vmm(char* addr){
 	int choice = menu();
 	page_replacement_policy = menu_PRP();
 
+	if(page_replacement_policy == 4){
+
+		int seed = get_seed_for_rand_replacement();
+		srand(seed);
+	}
+
 	if ( page_replacement_policy == 2 )
 	{
 		init_counter_usage_frame();
@@ -139,7 +145,17 @@ void run_vmm(char* addr){
 				/* Check This */
 				update_tlb(page_num, current_frame);
 				if ( page_replacement_policy == 1) // fifo
-				current_frame ++;
+					current_frame ++;
+				else if(page_replacement_policy == 4){  // Random
+
+					if(!mem_is_full){
+
+						current_frame++;
+						//cout<< " not full and current frame = "<<current_frame << endl;
+					}
+					else 
+						cout << " Memory full "<< endl;
+				}
 			}
 		}			
 	}
@@ -223,7 +239,7 @@ void print_statistics(){
 
 void generate_rands(){
 
-	cout << "Enter seed for random number generation " << endl;
+	cout << "Enter seed for random address generation " << endl;
     int seed;
 	cin>> seed;
 	srand(seed);
@@ -242,9 +258,7 @@ void generate_rands(){
    			exit(0);
 
   }
-
    myfile.close(); 
-
 }
 
 int fRand(int fMax){
@@ -273,10 +287,12 @@ int menu_PRP(){
 	cout << "***** choose page replacement policy ***** " << endl;
 	cout << "Mode 1 : FIFO"<<endl;
 	cout << "Mode 2 : LRU"<<endl;
+	cout << "Mode 3 : Second Chance"<<endl;   /* TODO*/
+	cout << "Mode 4 : Random"<<endl;
 	
 	int choice;
 	cin >> choice;
-	if( choice != 1 && choice != 2){
+	if( choice != 1 && choice != 2 && choice != 4){
 
 		cout <<" invalid choice";
 		exit(EXIT_FAILURE);
@@ -317,7 +333,7 @@ void swap_in(int page_num){
 	 	 bool mem_state = is_memory_full(available_frame);
 	 	 if ( mem_state == true )
 	 	 {
-	 	 	 cout << " memory is full " << endl;
+	 	 	 //cout << " memory is full " << endl;
 	 	 	 current_frame =find_LRU();
 	 	 }
 	 	 else if ( mem_state == false )
@@ -328,12 +344,27 @@ void swap_in(int page_num){
 	 
 	 else if ( page_replacement_policy == 1) // FIFO
 	 {
-	 	 if(current_frame >=  128){
+	 	 if(current_frame >=  NUM_OF_FRAMES){
 	 	 current_frame = 0;
-	 	 cout << " memory is full " << endl;
+	 	 //cout << " memory is full " << endl;
 	     }
 	 }
-     cout << " current frame = " << current_frame << endl;
+	 else if(page_replacement_policy == 4){  //Random Replacement
+
+	 	if(current_frame >= NUM_OF_FRAMES){
+
+	 		mem_is_full = true; 
+	 		/* after all the free frames are used, this gets true and we use random replacing */ 
+	 	}
+
+	 	if(mem_is_full){
+
+	 		current_frame = fRand(NUM_OF_FRAMES);
+	 		//cout<< " here " << endl;
+	 		//cout << " Random current frame = " << current_frame << endl;
+	 	}
+	 }
+     //cout << " current frame = " << current_frame << endl;
 
 	 fseek(backingStore, current_frame*256, SEEK_SET);
      fread(buf, sizeof(char), 256, backingStore);
@@ -351,6 +382,11 @@ void generate_rands_with_locality(int mode){
 
 	ofstream outfile;
 	outfile.open("myaddresses.txt");
+
+	cout << "Enter seed for random address generation" << endl;
+	int seed;
+	cin >> seed;
+	srand(seed);
 
 	if(mode == 0){
 
@@ -381,11 +417,8 @@ void generate_rands_with_locality(int mode){
     		 outfile << f << endl;
     		 counter ++;
 		 }    
-
-
-  }
-
-}
+      }
+   }
 
 }
 
@@ -404,7 +437,6 @@ bool is_memory_full(int& available_frame){
 			available_frame = i;
 			return false; // mem is not full
 		} 
-
 	}
 	return true; // mem is full
 }
@@ -431,4 +463,12 @@ int find_LRU(){
 		counter_usage_frame[0] = 0;
 		return 0;
 	}
+}
+
+int get_seed_for_rand_replacement(){
+
+	cout << " Enter seed for Random Page frame replacement"<<endl;
+	int seed;
+	cin >> seed;
+	return seed;
 }

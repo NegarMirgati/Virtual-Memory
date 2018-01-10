@@ -18,7 +18,7 @@
 #define mm_rw 1000
 #define disk_rw 250000
 
-#define num_of_tests 1000
+#define num_of_tests 10000
 
 #define MYADDR "myaddresses.txt"
 #define BACKING_STORE_ADDR "BACKING_STORE.bin"
@@ -41,6 +41,8 @@ int current_frame = 0;
 
 int page_replacement_policy;  /* 1.FIFO 2.LRU 3.second chance 4.random replacement */
 
+bool mem_is_full = false;  /* Random Replacement */
+
 /* VMM Funcs */
 
 
@@ -58,6 +60,8 @@ void update_tlb(int page_num, int frame_num);
 void update_counter_usage_frame(int frame_num);
 bool is_memory_full(int& available_frame);
 int find_LRU();
+void swap_in(int page_num);
+int get_seed_for_rand_replacement();
 
 /* Other Funcs*/
 void generate_rands();
@@ -67,6 +71,6 @@ int menu();
 int menu_PRP();
 void print_statistics();
 bool check_arg(int argc, char* argv[]);
-void swap_in(int page_num);
+
 
  
