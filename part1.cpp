@@ -65,6 +65,7 @@ void run_vmm(char* addr){
 
 	int counter = 0;
 
+    ofstream outfile("OUTPUT.txt");
 
 	while(getline(infile, line)){
 
@@ -85,10 +86,11 @@ void run_vmm(char* addr){
 		int frame_num = find_in_tlb(page_num);
 
 		/* TLB hit */
+		int phys_addr;
 		if(frame_num != -1){
 
 				/* check this */
-			    int phys_addr = frame_num * FRAME_SIZE + offset;
+			    phys_addr = frame_num * FRAME_SIZE + offset;
                 final_value = phys_mem[phys_addr];
 		}
 
@@ -98,7 +100,7 @@ void run_vmm(char* addr){
 			/* found in page table */
 			if(frame_num != -1){
 
-				int phys_addr = frame_num * FRAME_SIZE + offset;
+				phys_addr = frame_num * FRAME_SIZE + offset;
 				update_tlb(page_num, frame_num);
 				final_value = phys_mem[phys_addr];
 			}
@@ -108,17 +110,19 @@ void run_vmm(char* addr){
 			    // update page table
 				page_table[page_num] = current_frame;
 
-				int phys_addr = current_frame * FRAME_SIZE + offset;
+				phys_addr = current_frame * FRAME_SIZE + offset;
 				final_value = phys_mem[phys_addr];
 
 				/* Check This */
 				update_tlb(page_num, current_frame);
 				current_frame ++;
 			}
-		}			
+		}
+		outfile << "virtual address : "<< line << " ,physical addr :" << phys_addr << " ,value :" << final_value << endl;			
 	}
 
 	 infile.close();
+	 outfile.close();
 	 print_statistics();
 }
 
