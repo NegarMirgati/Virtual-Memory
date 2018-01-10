@@ -112,7 +112,7 @@ void run_vmm(char* addr){
 				final_value = phys_mem[phys_addr];
 
 				/* Check This */
-				//update_tlb(page_num, current_frame);
+				update_tlb(page_num, current_frame);
 				current_frame ++;
 			}
 		}			
