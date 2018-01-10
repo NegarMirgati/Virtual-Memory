@@ -77,7 +77,7 @@ void run_vmm(char* addr){
 		 infile.open(addr);
 	else
 	{
-    	generate_rands();
+    	generate_rands_with_locality(0);
 		infile.open(MYADDR);
 	}
 
@@ -249,7 +249,9 @@ void generate_rands(){
 
     for(int i = 0; i < num_of_tests; i++){
 
-   		int  out = fRand(PHYS_MEM_SIZE);
+   		int  temp_out = fRand(PHYS_MEM_SIZE);
+   		int ratio = fRand(2);
+   		long out = (ratio+1) * temp_out;
     	if (myfile.is_open()){
 
     		myfile << out << endl;
@@ -333,7 +335,7 @@ void swap_in(int page_num){
 	 	 bool mem_state = is_memory_full(available_frame);
 	 	 if ( mem_state == true )
 	 	 {
-	 	 	 //cout << " memory is full " << endl;
+	 	 	 cout << " memory is full " << endl;
 	 	 	 current_frame =find_LRU();
 	 	 }
 	 	 else if ( mem_state == false )
@@ -398,7 +400,9 @@ void generate_rands_with_locality(int mode){
 
      	for(int j = 0 ; j < 10 ; j++){
     		 int f = (temp_f + j) % PHYS_MEM_SIZE;
-    		 outfile << f << endl;
+    		 int ratio = fRand(2);
+    		 long out = f * (ratio + 1);
+    		 outfile << out << endl;
     		 counter ++;
 		 }    
  	 }
@@ -414,7 +418,9 @@ void generate_rands_with_locality(int mode){
 
      	for(int j = 0 ; j < 100 ; j++){
     		 int f = (temp_f + j) % PHYS_MEM_SIZE;
-    		 outfile << f << endl;
+    		 int ratio = fRand(2);
+    		 long out = f * (ratio + 1);
+    		 outfile << out << endl;
     		 counter ++;
 		 }    
       }
