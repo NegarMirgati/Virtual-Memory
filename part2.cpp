@@ -52,6 +52,11 @@ void init_state_phys_mem(){
 		state_phys_mem[i] = 0;
 	}
 }
+void init_second_chance(){
+	for ( int i = 0 ; i < NUM_OF_FRAMES ; i++) {
+		second_chance[i] = 0;
+	}
+}
 
 void run_vmm(char* addr){
 
@@ -64,8 +69,12 @@ void run_vmm(char* addr){
 		srand(seed);
 	}
 
-	if ( page_replacement_policy == 2 )
-	{
+	if ( page_replacement_policy == 3 ){
+
+		init_second_chance();
+	}
+
+	if ( page_replacement_policy == 2 ){
 		init_counter_usage_frame();
 		init_state_phys_mem();
 	}
@@ -118,6 +127,8 @@ void run_vmm(char* addr){
 			    phys_addr = frame_num * FRAME_SIZE + offset;
                 final_value = phys_mem[phys_addr];
                 update_counter_usage_frame(frame_num);
+                if ( page_replacement_policy == 3)
+                	second_chance[frame_num] = 1;
 		}
 
 		else{
@@ -132,6 +143,8 @@ void run_vmm(char* addr){
 
 				if ( page_replacement_policy == 2 )
 					update_counter_usage_frame(frame_num);
+				if ( page_replacement_policy == 3)
+                	second_chance[frame_num] = 1;
 
 			}
 			// not found in page table : demand paging
@@ -146,8 +159,9 @@ void run_vmm(char* addr){
 
 				/* Check This */
 				update_tlb(page_num, current_frame);
-				if ( page_replacement_policy == 1) // fifo
+				if ( page_replacement_policy == 1 || page_replacement_policy == 3 ) {// fifo , second chance
 					current_frame ++;
+				}
 				else if(page_replacement_policy == 4){  // Random
 
 					if(!mem_is_full){
@@ -298,7 +312,7 @@ int menu_PRP(){
 	
 	int choice;
 	cin >> choice;
-	if( choice != 1 && choice != 2 && choice != 4){
+	if( choice != 1 && choice != 2 && choice != 4 && choice != 3 ){
 
 		cout <<" invalid choice";
 		exit(EXIT_FAILURE);
@@ -355,6 +369,25 @@ void swap_in(int page_num){
 	 	 //cout << " memory is full " << endl;
 	     }
 	 }
+	 else if ( page_replacement_policy == 3) // second chance 
+	 {
+	 	 if(current_frame >=  NUM_OF_FRAMES)
+	 	 {
+	 	 	mem_is_full = true;
+	 	 	current_frame = 0;
+	 	 }
+	 	 if ( mem_is_full )
+	 	 {
+
+	 	 	while( second_chance[current_frame] != 0 )
+	 	 	{
+	 	 		second_chance[current_frame] = 0;
+	 	 		current_frame++;
+	 	 		if ( current_frame >=  NUM_OF_FRAMES)
+	 	 			current_frame = 0;
+	 	 	} 
+	 	 }
+	 }
 	 else if(page_replacement_policy == 4){  //Random Replacement
 
 	 	if(current_frame >= NUM_OF_FRAMES){
@@ -380,7 +413,9 @@ void swap_in(int page_num){
         phys_mem[current_frame* 256 + index] = buf[index];
       }
        state_phys_mem[current_frame] = 1;
-       update_counter_usage_frame(current_frame); /*?*/
+       update_counter_usage_frame(current_frame); 
+       if ( page_replacement_policy == 3 )
+       	second_chance[current_frame] = 0;
   
 }
 

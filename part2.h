@@ -29,6 +29,7 @@ int page_table[PAGE_TABLE_ENTRIES];
 int tlb[TLB_ENTRIES][2];
 int counter_usage_frame[NUM_OF_FRAMES];  //recently used page in frame will have a bigger number
 int state_phys_mem[NUM_OF_FRAMES]; // 0 => empty ,  1=> full 
+int second_chance[NUM_OF_FRAMES];
 
 int num_of_tlb_hits = 0;
 int num_of_page_faults = 0;
@@ -50,6 +51,7 @@ void init_pt();
 void init_tlb();
 void init_counter_usage_frame();
 void init_state_phys_mem();
+void init_second_chance();
 
 void run_vmm(char* addr);
 int get_offset(std::string addr);
