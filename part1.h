@@ -5,6 +5,11 @@
 #include <string>
 #include <time.h>
 #include <bitset>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <string.h>
 
 #define PAGE_SIZE 256
 #define PAGE_TABLE_ENTRIES 256
@@ -24,9 +29,13 @@
 #define BACKING_STORE_ADDR "BACKING_STORE.bin"
 
 
-int phys_mem[PHYS_MEM_SIZE];  /// 1 byte 
+char phys_mem[PHYS_MEM_SIZE];  /// 1 byte 
 int page_table[PAGE_TABLE_ENTRIES];
 int tlb[TLB_ENTRIES][2];
+
+int store_fd;
+void* store_data;
+char* storage;
 
 int num_of_tlb_hits = 0;
 int num_of_page_faults = 0;
@@ -37,11 +46,13 @@ int tlb_ptr = -1;   /* FIFO tlb replacement policy */
 
 int current_frame = 0;
 
+
 /* VMM Funcs */
 
 
 void init_pt();
 void init_tlb();
+
 
 
 void run_vmm(char* addr);
@@ -51,6 +62,7 @@ int find_in_tlb(int page_num);  /*modified*/
 int find_in_page_table(int page_table_num); /*modified*/
 void update_tlb(int page_num, int frame_num); 
 void swap_in(int page_num);
+void mmap_store();
 
 /* Other Funcs*/
 void generate_rands();

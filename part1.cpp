@@ -9,6 +9,7 @@ int main(int argc , char *argv[]){
    
    init_pt();
    init_tlb();
+   mmap_store();
 
    run_vmm(argv[1]);
 
@@ -266,19 +267,9 @@ void update_tlb(int page_num, int frame_num){
 }
 
 void swap_in(int page_num){
-
-	char buf[256];
-	int index = 0;
-
-	 FILE *backingStore = fopen("BACKING_STORE.bin", "rb");
-
-	 fseek(backingStore, current_frame*256, SEEK_SET);
-     fread(buf, sizeof(char), 256, backingStore);
-
-     for(index = 0; index < 256; index++) {
-     	//cout << " writing " << buf[index] << " to phys_mem " << current_frame * 256 + index << endl;
-        phys_mem[current_frame* 256 + index] = buf[index];
-      }
+    
+    //cout << "current frame = "<<current_frame<<" page num = " << page_num << endl; 
+	memcpy(phys_mem + current_frame*FRAME_SIZE, storage + page_num*PAGE_SIZE, FRAME_SIZE);
 }
 
 void generate_rands_with_locality(int mode){
@@ -327,5 +318,24 @@ void generate_rands_with_locality(int mode){
       }
    }
 
+}
+
+
+
+void mmap_store(){
+
+	    /* Open the store file. */
+        /* Map the store file to memory. */
+        /* Initialize the file descriptor. */
+        int store_fd = open(BACKING_STORE_ADDR, O_RDONLY);
+        void* store_data = mmap(0, PHYS_MEM_SIZE, PROT_READ, MAP_SHARED, store_fd, 0);
+        /* Check that the mmap call succeeded. */
+        if (store_data == MAP_FAILED) {
+            close(store_fd);
+            printf("Error mmapping the backing store file!");
+            exit(EXIT_FAILURE);
+        }
+
+        storage = static_cast<char*> (store_data);
 }
 

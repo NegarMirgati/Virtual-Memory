@@ -5,6 +5,11 @@
 #include <string>
 #include <time.h>
 #include <bitset>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <string.h>
 
 #define PAGE_SIZE 256
 #define PAGE_TABLE_ENTRIES 256
@@ -24,7 +29,7 @@
 #define BACKING_STORE_ADDR "BACKING_STORE.bin"
 
 
-int phys_mem[PHYS_MEM_SIZE];  /// 1 byte 
+char phys_mem[PHYS_MEM_SIZE];  /// 1 byte 
 int page_table[PAGE_TABLE_ENTRIES];
 int tlb[TLB_ENTRIES][2];
 int counter_usage_frame[NUM_OF_FRAMES];  //recently used page in frame will have a bigger number
@@ -33,6 +38,10 @@ int second_chance[NUM_OF_FRAMES];
 
 int num_of_tlb_hits = 0;
 int num_of_page_faults = 0;
+
+char* storage;
+int store_fd;
+void* store_data;
 
 int final_value;    /* value read from phys mem */
 
@@ -73,6 +82,7 @@ int menu();
 int menu_PRP();
 void print_statistics();
 bool check_arg(int argc, char* argv[]);
+void mmap_store();
 
 
  
