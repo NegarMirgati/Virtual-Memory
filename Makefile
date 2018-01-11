@@ -5,4 +5,4 @@ vmm1.o : part1.cpp part1.h
 vmm2.o :part2.cpp part2.h
 	g++ -g part2.cpp -o vmm2.o && echo success
 clean :
-	rm  -f addresses.txt myaddresses.txt *.o *.out 
+	rm  -f  myaddresses.txt OUTPUT.txt *.o *.out 
