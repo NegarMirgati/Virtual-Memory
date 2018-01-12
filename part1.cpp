@@ -53,7 +53,7 @@ void run_vmm(char* addr){
 		 infile.open(addr);
 	else
 	{
-    	generate_rands();
+    	generate_rands_with_locality(1);
 		infile.open(MYADDR);
 	}
 
@@ -286,11 +286,11 @@ void generate_rands_with_locality(int mode){
 
 		int counter = 0;
 
-		for(int i = 0 ; i < 1000 ; i++){
+		for(int i = 0 ; i < num_of_tests/10 ; i++){
 
     	 int temp_f = rand() % PHYS_MEM_SIZE;
 
-     	for(int j = 0 ; j < 10 ; j++){
+     	for(int j = 0 ; j < num_of_tests/1000 ; j++){
     		 int f = (temp_f + j) % PHYS_MEM_SIZE;
     		 int ratio = fRand(2);
     		 long out = f * (ratio + 1);
@@ -299,16 +299,15 @@ void generate_rands_with_locality(int mode){
 		 }    
  	 }
   }
-
   else if (mode == 1){
 
   	int counter = 0;
 
-		for(int i = 0 ; i < 100 ; i++){
+		for(int i = 0 ; i < num_of_tests/100 ; i++){
 
     	 int temp_f = rand() % PHYS_MEM_SIZE;
 
-     	for(int j = 0 ; j < 100 ; j++){
+     	for(int j = 0 ; j < num_of_tests/100 ; j++){
     		 int f = (temp_f + j) % PHYS_MEM_SIZE;
     		 int ratio = fRand(2);
     		 long out = f * (ratio + 1);
@@ -317,7 +316,6 @@ void generate_rands_with_locality(int mode){
 		 }    
       }
    }
-
 }
 
 
