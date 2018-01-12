@@ -31,7 +31,8 @@ bool check_arg(int argc, char* argv[]){
 void init_pt(){
 
 	 for (int i = 0; i < PAGE_TABLE_ENTRIES; i++) {
-        page_table[i] = -1;
+        page_table[i][0] = -1;
+        page_table[i][1] = 0;
     }
 }
 
@@ -140,6 +141,8 @@ void run_vmm(char* addr){
 			if(frame_num != -1){
 
 				phys_addr = frame_num * FRAME_SIZE + offset;
+
+				//cout << " phys addr =  " << phys_addr << endl;
 				update_tlb(page_num, frame_num);
 				final_value = phys_mem[phys_addr];
 
@@ -154,7 +157,8 @@ void run_vmm(char* addr){
 
 				swap_in(page_num);
 			    // update page table
-				page_table[page_num] = current_frame;
+				add_entry_to_page_table(page_num, current_frame);
+
 
 				phys_addr = current_frame * FRAME_SIZE + offset;
 				final_value = phys_mem[phys_addr];
@@ -171,8 +175,8 @@ void run_vmm(char* addr){
 						current_frame++;
 						//cout<< " not full and current frame = "<<current_frame << endl;
 					}
-					else 
-						cout << " Memory full "<< endl;
+					/*else 
+						cout << " Memory full "<< endl;*/
 				}
 			}
 		}
@@ -217,9 +221,10 @@ int find_in_tlb(int page_num){
 
 int find_in_page_table(int page_table_num){
 
-	int val = page_table[page_table_num];
+	int val = page_table[page_table_num][0];
+	int valid = page_table[page_table_num][1];
 
-    if (val == -1) {
+    if (val == -1 || valid == 0) {
 		num_of_page_faults++;
     }
     
@@ -361,7 +366,7 @@ void swap_in(int page_num){
 	 {
 	 	 if(current_frame >=  NUM_OF_FRAMES){
 	 	 current_frame = 0;
-	 	 //cout << " memory is full " << endl;
+	 	 //rolls back to the begining of the queue
 	     }
 	 }
 	 else if ( page_replacement_policy == 3) // second chance 
@@ -393,7 +398,18 @@ void swap_in(int page_num){
 
 	 	if(mem_is_full){
 
-	 		current_frame = fRand(NUM_OF_FRAMES);
+	 		//current_frame = fRand;
+	 		int rand_index ;
+	 		while(true){
+
+	 			rand_index = fRand(PAGE_TABLE_ENTRIES);
+	 			//cout << " index = " << rand_index << endl;
+	 			if(page_table[rand_index][1])   /* if this entry is valid (it is in phys_mem) */
+	 				break;
+	 		}
+
+	 		current_frame = page_table[rand_index][0];
+	 		remove_entry_from_page_table(rand_index);
 	 		//cout<< " here " << endl;
 	 		//cout << " Random current frame = " << current_frame << endl;
 	 	}
@@ -521,4 +537,17 @@ void mmap_store(){
         }
 
         storage = static_cast<char*> (store_data);
+}
+
+void remove_entry_from_page_table(int page_num){
+
+	page_table[page_num][1] = 0;
+}
+
+void add_entry_to_page_table(int page_num, int frame_num){
+
+	//cout << " adding entry" << frame_num << " to page number " << page_num << endl;
+
+	page_table[page_num][0] = frame_num;
+	page_table[page_num][1] = 1;
 }

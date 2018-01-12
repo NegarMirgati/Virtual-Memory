@@ -1,5 +1,5 @@
 *.o
 *.out
-*.txt
+#*.txt
 *DS_Store
 vmm.o.dSYM/

@@ -30,7 +30,7 @@
 
 
 char phys_mem[PHYS_MEM_SIZE];  /// 1 byte 
-int page_table[PAGE_TABLE_ENTRIES];
+int page_table[PAGE_TABLE_ENTRIES][2];   /// valid or invalid
 int tlb[TLB_ENTRIES][2];
 int counter_usage_frame[NUM_OF_FRAMES];  //recently used page in frame will have a bigger number
 int state_phys_mem[NUM_OF_FRAMES]; // 0 => empty ,  1=> full 
@@ -75,6 +75,9 @@ bool is_memory_full(int& available_frame);
 int find_LRU();
 void mmap_store();
 void swap_in(int page_num);
+void remove_entry_from_page_table(int page_num);
+void add_entry_to_page_table(int page_num, int current_frame);
+
 
 
 /* Other Funcs*/
