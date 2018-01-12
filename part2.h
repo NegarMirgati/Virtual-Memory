@@ -76,7 +76,9 @@ int find_LRU();
 void mmap_store();
 void swap_in(int page_num);
 void remove_entry_from_page_table(int page_num);
+void remove_entry_from_page_table_framenum(int frame_num);
 void add_entry_to_page_table(int page_num, int current_frame);
+void update_tlb_after_page_fault(int page_num, int frame_num);
 
 
 

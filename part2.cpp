@@ -106,19 +106,10 @@ void run_vmm(char* addr){
 
 	while(getline(infile, line)){
 
-        /*cout << " virtual addr is " << line << endl;
-        std::cout << std::bitset<32>(atoi(line.c_str())) << endl;*/
-
 		int offset = get_offset(line);
 		int page_num = get_page_num(line);
 
 		counter++;
-
-		/*cout << " offset is " << offset << endl;
-		std::cout << std::bitset<8>(offset);*/
-
-		/*cout << " page num is " << page_num << endl;
-		std::cout << std::bitset<8>(page_num);*/
 
 		int frame_num = find_in_tlb(page_num);
 
@@ -156,7 +147,7 @@ void run_vmm(char* addr){
 			else{
 
 				swap_in(page_num);
-			    // update page table
+			    // Add this page and its allocated frame to page table
 				add_entry_to_page_table(page_num, current_frame);
 
 
@@ -164,7 +155,7 @@ void run_vmm(char* addr){
 				final_value = phys_mem[phys_addr];
 
 				/* Check This */
-				update_tlb(page_num, current_frame);
+				update_tlb_after_page_fault(page_num, current_frame);
 				if ( page_replacement_policy == 1 || page_replacement_policy == 3 ) {// fifo , second chance
 					current_frame ++;
 				}
@@ -368,6 +359,7 @@ void swap_in(int page_num){
 	 	 current_frame = 0;
 	 	 //rolls back to the begining of the queue
 	     }
+	     remove_entry_from_page_table_framenum(current_frame);
 	 }
 	 else if ( page_replacement_policy == 3) // second chance 
 	 {
@@ -404,7 +396,7 @@ void swap_in(int page_num){
 
 	 			rand_index = fRand(PAGE_TABLE_ENTRIES);
 	 			//cout << " index = " << rand_index << endl;
-	 			if(page_table[rand_index][1])   /* if this entry is valid (it is in phys_mem) */
+	 			if(page_table[rand_index][1])   /* if this entry is valid (has not been swapped out) */
 	 				break;
 	 		}
 
@@ -550,4 +542,29 @@ void add_entry_to_page_table(int page_num, int frame_num){
 
 	page_table[page_num][0] = frame_num;
 	page_table[page_num][1] = 1;
+}
+
+void remove_entry_from_page_table_framenum(int frame_num){
+
+	for(int i = 0 ; i < PAGE_TABLE_ENTRIES ; i++){
+
+		if(page_table[i][0] == frame_num)  // if this entry is in frame frame_num
+			page_table[i][1] = 0;   
+	}
+}
+
+void update_tlb_after_page_fault(int page_num, int frame_num){
+
+	for(int i = 0 ; i < TLB_ENTRIES ; i++){
+
+		if(tlb[i][1] == frame_num){ 
+		 // if this frame exists in page table just change its page number because we've swapped it out 
+
+			tlb[i][0] = page_num;
+			return;
+		}
+			
+	}
+    // The frame was not in tlb so swap with next ptr 
+	update_tlb(page_num, frame_num);
 }
