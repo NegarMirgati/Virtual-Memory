@@ -41,6 +41,7 @@ void init_tlb(){
 	for (int i = 0; i < TLB_ENTRIES; i++) {
         tlb[i][0] = -1;
         tlb[i][1] = -1;
+        tlb[i][2] = 0;
     }
 }
 
@@ -155,7 +156,8 @@ void run_vmm(char* addr){
 				final_value = phys_mem[phys_addr];
 
 				/* Check This */
-				update_tlb_after_page_fault(page_num, current_frame);
+				invalidate_entry_in_tlb(current_frame);
+				update_tlb(page_num, current_frame);
 				if ( page_replacement_policy == 1 || page_replacement_policy == 3 ) {// fifo , second chance
 					current_frame ++;
 				}
@@ -196,7 +198,7 @@ int find_in_tlb(int page_num){
 	// TLB Walk
 	for(i = 0; i < TLB_ENTRIES; i++){
 
-		if(tlb[i][0] == page_num){
+		if(tlb[i][0] == page_num && tlb[i][2] != 0){
 
 			hit = true;
 			num_of_tlb_hits ++;
@@ -319,11 +321,21 @@ int menu_PRP(){
 
 void update_tlb(int page_num, int frame_num){
 
+	int index = find_empty_index_in_tlb();
+	if(index != -1){
+
+		tlb[index][0] = page_num;
+		tlb[index][1] = frame_num;
+		tlb[index][2] = 1;
+		return;
+	}
+
     if (tlb_ptr == -1) {
 
        tlb_ptr = 0;
         tlb[tlb_ptr][0] = page_num;
         tlb[tlb_ptr][1] = frame_num;
+        tlb[tlb_ptr][2] = 1;
     }
     else {
 
@@ -331,6 +343,7 @@ void update_tlb(int page_num, int frame_num){
 
         tlb[tlb_ptr][0] = page_num;
         tlb[tlb_ptr][1] = frame_num;
+        tlb[tlb_ptr][2] = 1;
     }
 
 }
@@ -553,18 +566,24 @@ void remove_entry_from_page_table_framenum(int frame_num){
 	}
 }
 
-void update_tlb_after_page_fault(int page_num, int frame_num){
+void invalidate_entry_in_tlb(int frame_num){
 
 	for(int i = 0 ; i < TLB_ENTRIES ; i++){
 
 		if(tlb[i][1] == frame_num){ 
-		 // if this frame exists in page table just change its page number because we've swapped it out 
-
-			tlb[i][0] = page_num;
-			return;
+		 	tlb[i][2] = 0;
 		}
-			
 	}
     // The frame was not in tlb so swap with next ptr 
-	update_tlb(page_num, frame_num);
+	//update_tlb(page_num, frame_num);
+}
+
+int find_empty_index_in_tlb(){
+
+	for(int i = 0 ; i < TLB_ENTRIES ; i++){
+
+		if(tlb[i][2] == 0)
+			return i;
+	}
+	return -1;
 }

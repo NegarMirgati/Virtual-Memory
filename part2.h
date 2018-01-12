@@ -31,7 +31,7 @@
 
 char phys_mem[PHYS_MEM_SIZE];  /// 1 byte 
 int page_table[PAGE_TABLE_ENTRIES][2];   /// valid or invalid
-int tlb[TLB_ENTRIES][2];
+int tlb[TLB_ENTRIES][3];                 /// valid bit added
 int counter_usage_frame[NUM_OF_FRAMES];  //recently used page in frame will have a bigger number
 int state_phys_mem[NUM_OF_FRAMES]; // 0 => empty ,  1=> full 
 int second_chance[NUM_OF_FRAMES];
@@ -78,7 +78,8 @@ void swap_in(int page_num);
 void remove_entry_from_page_table(int page_num);
 void remove_entry_from_page_table_framenum(int frame_num);
 void add_entry_to_page_table(int page_num, int current_frame);
-void update_tlb_after_page_fault(int page_num, int frame_num);
+void invalidate_entry_in_tlb(int frame_num);
+int find_empty_index_in_tlb();
 
 
 
