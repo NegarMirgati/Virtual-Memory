@@ -12,6 +12,7 @@ int main(int argc , char *argv[]){
    mmap_store();
 
    run_vmm(argv[1]);
+   print_statistics();
 
 	return 0;
 }
@@ -180,7 +181,6 @@ void run_vmm(char* addr){
 
 	 infile.close();
 	 outfile.close();
-	 print_statistics();
 }
 
 int get_offset(string addr){
@@ -308,7 +308,7 @@ int menu_PRP(){
 	cout << "***** choose page replacement policy ***** " << endl;
 	cout << "Mode 1 : FIFO"<<endl;
 	cout << "Mode 2 : LRU"<<endl;
-	cout << "Mode 3 : Second Chance"<<endl;   /* TODO*/
+	cout << "Mode 3 : Second Chance"<<endl;   
 	cout << "Mode 4 : Random"<<endl;
 	
 	int choice;
@@ -338,7 +338,6 @@ void update_tlb(int page_num, int frame_num){
     }
 
 }
-
 
 void swap_in(int page_num){
 
@@ -406,8 +405,7 @@ void swap_in(int page_num){
        state_phys_mem[current_frame] = 1;
        update_counter_usage_frame(current_frame); 
        if ( page_replacement_policy == 3 )
-       	second_chance[current_frame] = 0;
-  
+       	second_chance[current_frame] = 0; 
 }
 
 void generate_rands_with_locality(int mode){
@@ -523,5 +521,4 @@ void mmap_store(){
         }
 
         storage = static_cast<char*> (store_data);
-        //cout << "sdasdad " << storage[64904] << endl;
 }

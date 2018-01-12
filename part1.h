@@ -33,10 +33,12 @@ char phys_mem[PHYS_MEM_SIZE];  /// 1 byte
 int page_table[PAGE_TABLE_ENTRIES];
 int tlb[TLB_ENTRIES][2];
 
+/* MMPAP variables */
 int store_fd;
 void* store_data;
 char* storage;
 
+/* statistics variables */
 int num_of_tlb_hits = 0;
 int num_of_page_faults = 0;
 

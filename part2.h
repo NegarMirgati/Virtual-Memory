@@ -36,9 +36,11 @@ int counter_usage_frame[NUM_OF_FRAMES];  //recently used page in frame will have
 int state_phys_mem[NUM_OF_FRAMES]; // 0 => empty ,  1=> full 
 int second_chance[NUM_OF_FRAMES];
 
+/* statistics variables */
 int num_of_tlb_hits = 0;
 int num_of_page_faults = 0;
 
+/* MMPAP variables */
 char* storage;
 int store_fd;
 void* store_data;
@@ -71,18 +73,20 @@ void update_tlb(int page_num, int frame_num);
 void update_counter_usage_frame(int frame_num);
 bool is_memory_full(int& available_frame);
 int find_LRU();
+void mmap_store();
 void swap_in(int page_num);
-int get_seed_for_rand_replacement();
+
 
 /* Other Funcs*/
 void generate_rands();
 void generate_rands_with_locality(int mode);
+int get_seed_for_rand_replacement();
 int fRand(int fMax);
 int menu();
 int menu_PRP();
 void print_statistics();
 bool check_arg(int argc, char* argv[]);
-void mmap_store();
+
 
 
  
