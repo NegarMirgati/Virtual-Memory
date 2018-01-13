@@ -163,6 +163,7 @@ void run_vmm(char* addr){
 				/* Check This */
 				invalidate_entry_in_tlb(current_frame);
 				update_tlb(page_num, current_frame);
+
 				if ( page_replacement_policy == 1 || page_replacement_policy == 3 ) {// fifo , second chance
 					current_frame ++;
 				}
@@ -224,9 +225,12 @@ int find_in_page_table(int page_table_num){
 
     if (val == -1 || valid == 0) {
 		num_of_page_faults++;
+		return -1;
     }
-    
+
     return val;
+    
+    
 }
 
 void print_statistics(){
@@ -381,6 +385,7 @@ void swap_in(int page_num){
 	     }
 	     remove_entry_from_page_table_framenum(current_frame);
 	 }
+
 	 else if ( page_replacement_policy == 3) // second chance 
 	 {
 	 	 if(current_frame >=  NUM_OF_FRAMES)
