@@ -124,6 +124,7 @@ void run_vmm(char* addr){
                 update_counter_usage_frame(frame_num);
                 if ( page_replacement_policy == 3)
                 	second_chance[frame_num] = 1;
+                //outfile << "HIT" << endl;
 		}
 
 		else{
@@ -143,9 +144,13 @@ void run_vmm(char* addr){
 				if ( page_replacement_policy == 3)
                 	second_chance[frame_num] = 1;
 
+                //outfile << "PT HIT" << endl;
+
 			}
 			// not found in page table : demand paging
 			else{
+
+				//outfile << "PAGE FAULT" << endl;
 
 				swap_in(page_num);
 			    // Add this page and its allocated frame to page table
@@ -173,7 +178,7 @@ void run_vmm(char* addr){
 				}
 			}
 		}
-		outfile << "virtual address : "<< line << " ,physical addr :" << phys_addr << " ,value :" << final_value << endl;			
+		outfile << "Virtual address: "<< line << " Physical address: " << phys_addr << " Value: " << final_value << endl;			
 	}
 
 	 infile.close();
@@ -209,7 +214,7 @@ int find_in_tlb(int page_num){
 	if(!hit)
 		return -1;
 	else
-		return i;
+		return tlb[i][1];
 }
 
 int find_in_page_table(int page_table_num){
@@ -321,6 +326,7 @@ int menu_PRP(){
 
 void update_tlb(int page_num, int frame_num){
 
+    // If there is an empty slot in TLB
 	int index = find_empty_index_in_tlb();
 	if(index != -1){
 
@@ -329,10 +335,10 @@ void update_tlb(int page_num, int frame_num){
 		tlb[index][2] = 1;
 		return;
 	}
-
+    // else 
     if (tlb_ptr == -1) {
 
-       tlb_ptr = 0;
+        tlb_ptr = 0;
         tlb[tlb_ptr][0] = page_num;
         tlb[tlb_ptr][1] = frame_num;
         tlb[tlb_ptr][2] = 1;
