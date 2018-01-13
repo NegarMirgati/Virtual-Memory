@@ -357,8 +357,9 @@ void swap_in(int page_num){
 	 	 bool mem_state = is_memory_full(available_frame);
 	 	 if ( mem_state == true )
 	 	 {
-	 	 	 cout << " memory is full " << endl;
+	 	 	 //cout << " memory is full " << endl;
 	 	 	 current_frame =find_LRU();
+	 	 	 remove_entry_from_page_table_framenum(current_frame);
 	 	 }
 	 	 else if ( mem_state == false )
 	 	 {
@@ -391,6 +392,7 @@ void swap_in(int page_num){
 	 	 		if ( current_frame >=  NUM_OF_FRAMES)
 	 	 			current_frame = 0;
 	 	 	} 
+	 	 	remove_entry_from_page_table_framenum(current_frame);
 	 	 }
 	 }
 	 else if(page_replacement_policy == 4){  //Random Replacement
