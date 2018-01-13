@@ -94,6 +94,7 @@ void run_vmm(char* addr){
 				/* check this */
 			    phys_addr = frame_num * FRAME_SIZE + offset;
                 final_value = phys_mem[phys_addr];
+                //outfile << "HIT" << endl;
 		}
 
 		else{
@@ -105,6 +106,7 @@ void run_vmm(char* addr){
 				phys_addr = frame_num * FRAME_SIZE + offset;
 				update_tlb(page_num, frame_num);
 				final_value = phys_mem[phys_addr];
+				//outfile << "PT HIT" << endl;
 			}
 			// not found in page table : demand paging
 			else{
@@ -114,13 +116,14 @@ void run_vmm(char* addr){
 
 				phys_addr = current_frame * FRAME_SIZE + offset;
 				final_value = phys_mem[phys_addr];
-
+				//outfile << "PAGE FAULT" << endl;
 				/* Check This */
 				update_tlb(page_num, current_frame);
 				current_frame ++;
 			}
 		}
-		outfile << "virtual address : "<< line << " ,physical addr :" << phys_addr << " ,value :" << final_value << endl;			
+		outfile << "Virtual address: "<< line << " Physical address: " << phys_addr << " Value: " << final_value << endl;			
+	
 	}
 
 	 infile.close();
@@ -156,7 +159,7 @@ int find_in_tlb(int page_num){
 	if(!hit)
 		return -1;
 	else
-		return i;
+		return tlb[i][1];
 }
 
 int find_in_page_table(int page_table_num){
