@@ -492,7 +492,7 @@ void generate_rands_with_locality(int mode){
 
 void update_counter_usage_frame(int frame_num){
 
-	counter_usage_frame[frame_num]++;
+	counter_usage_frame[frame_num] = recent++;
 }
 
 bool is_memory_full(int& available_frame){

@@ -33,6 +33,7 @@ char phys_mem[PHYS_MEM_SIZE];  /// 1 byte
 int page_table[PAGE_TABLE_ENTRIES][2];   /// valid or invalid
 int tlb[TLB_ENTRIES][3];                 /// valid bit added
 int counter_usage_frame[NUM_OF_FRAMES];  //recently used page in frame will have a bigger number
+int recent = 1;
 int state_phys_mem[NUM_OF_FRAMES]; // 0 => empty ,  1=> full 
 int second_chance[NUM_OF_FRAMES];
 
